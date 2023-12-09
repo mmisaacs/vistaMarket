@@ -39,7 +39,7 @@ public class finalProject{
         //Utility Tab
         JPanel Groceries = createPanel(3);
         //shopping cart tab
-        JPanel shoppingCart = new JPanel();
+        JPanel shoppingCart = createPanel(4);
         
         
         jtp.add("Beverages", Beverages);
@@ -67,13 +67,17 @@ public class finalProject{
 		JPanel thisPanel = new JPanel();
 
 		thisPanel.setLayout(new BoxLayout(thisPanel,BoxLayout.Y_AXIS));
-		JPanel firstPan = new JPanel();
-		firstPan.setMaximumSize(new Dimension(500,30));
-		firstPan.add(comps[panelIndex][0]);
-		firstPan.add(Box.createHorizontalGlue());
-		firstPan.add(Box.createHorizontalStrut(270));
-		firstPan.add(new JLabel("Quantity"));
-		thisPanel.add(firstPan);
+		if(comps[panelIndex].length == 0) {
+			
+		}else if(comps[panelIndex][0] instanceof JLabel){
+			JPanel firstPan = new JPanel();
+			firstPan.setMaximumSize(new Dimension(500,30));
+			firstPan.add(comps[panelIndex][0]);
+			firstPan.add(Box.createHorizontalGlue());
+			firstPan.add(Box.createHorizontalStrut(270));
+			firstPan.add(new JLabel("Quantity"));
+			thisPanel.add(firstPan);
+		}
 		for(int i = 1;i< comps[panelIndex].length;i++) {
 			JPanel currRow = new JPanel();
 			
