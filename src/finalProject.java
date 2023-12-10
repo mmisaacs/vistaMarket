@@ -172,13 +172,15 @@ public class finalProject{
                         jcombo.setVisible(true);
                         dupCombo.setVisible(true);
                         selectedItems.add(itself);
-                        shoppingCart.removeAll();
                         jtp.remove(4);
                         shoppingCart = createPanel(4);
                         jtp.add("Shopping Cart", shoppingCart);
                     }else {
                         jcombo.setVisible(false);
-                        selectedItems.remove(this);
+                        selectedItems.remove(itself);
+                        jtp.remove(4);
+                        shoppingCart = createPanel(4);
+                        jtp.add("Shopping Cart", shoppingCart);
                     }
                 }
 
@@ -190,6 +192,7 @@ public class finalProject{
             this.jcombo.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    dupCombo.setSelectedItem(jcombo.getSelectedItem());
                     if(selectedItems.contains(itself)) {
                         //Do nothing
                     }else {
@@ -206,6 +209,7 @@ public class finalProject{
             this.dupCombo.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    jcombo.setSelectedItem(dupCombo.getSelectedItem());
                     if(selectedItems.contains(itself)) {
                         //Do nothing
                     }else {
