@@ -14,7 +14,11 @@ The program opens with the Vista Market logo and a button to start shopping. Aft
 
 ## Collaborators
 Ryan Dautel 
+
 Ian Dellosa
+
 Maddie Isaacs (https://github.com/mmisaacs)
+
 Michelle Paino
+
 Javi Wu
