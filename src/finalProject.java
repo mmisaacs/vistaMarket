@@ -1,141 +1,121 @@
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-
 import java.awt.event.*;
 import java.util.*;
 
 
-public class finalProject implements ActionListener{
-    JLabel labs[] = {new JLabel("Vista Market"),
-            new JLabel("Beverages ($4.00)"),
-            new JLabel("Quantity"),
-            new JLabel("Entrées ($4.00)"),
-            new JLabel("Utilities ($3.00)"),
-            new JLabel("Swipes Used: "),
-            new JLabel("Total: $0.00")};
+public class finalProject{
+    JPanel Beverages, Entraes, Utilities, Groceries, shoppingCart;
+    JFrame jfrm = new JFrame("Vista Market");
+    JLabel quant = new JLabel("Quantity");
+    JTabbedPane jtp;
+    JLabel totalPrice;
+    JLabel swipesLabel= new JLabel("Swipes needed: 0");
+    JLabel pointsLabel= new JLabel("Meal Points needed: 0");
+    JScrollPane scroll;
+    ImageIcon vista;
 
-    JCheckBox beverages[] =
-            {new JCheckBox("Pepsi"),
-                    new JCheckBox("Starry"),
-                    new JCheckBox("Gatorade")};
+    JButton getTotal;
+    JComponent comps[][] =
+            {{new JLabel("Beverages ($4.00)"),new item("Pepsi",4.0),new item("Starry",4.0),new item("Gatorade",4.0)},
 
-    JCheckBox food[] =
-            {new JCheckBox("Sandwich"),
-                    new JCheckBox("Salad"),
-                    new JCheckBox("Stouffer's Mac and Cheese")};
+                    {new JLabel("Entraes ($4.00)"),new item("Sandwich",4.0),new item("Salad",4.0),new item("Stouffer's Mac and Cheese",4.0)},
 
-    JCheckBox utility[] =
-            {new JCheckBox("Dawn Soap"),
-                    new JCheckBox("Sponge"),
-                    new JCheckBox("Advil")};
+                    {new JLabel("Utilities ($3.00)"),new item("Dawn Soap",3.0,true),new item("Sponge",3.0,true),new item("Advil",3.0,true)},
 
-    JComboBox<Integer>[] bevQuant;
-    JCheckBox Swipes = new JCheckBox("Swipes($8 each)");
-    JCheckBox mP = new JCheckBox("Points");
-    JButton calc = new JButton("Calculate");
-    LinkedList<Integer> selectedIndx = new LinkedList<>();
+                    {new JLabel("Groceries ($6.00)"),new item("Bread", 6.0),new item("Eggs", 6.0), new item("Milk", 6.0)},
+                    {new JLabel("Selected Items: ")}};
 
+    JCheckBox Swipes = new JCheckBox("Use Swipes ($8 each, 2 per purchase)");
+    final double SWIPE_VALUE = 8.0;
+
+    JCheckBox mP = new JCheckBox("Use Points ($1 each)");
+    LinkedList<item> selectedItems = new LinkedList<>();
     finalProject(){
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.NORTHWEST;
-
-        JFrame jfrm = new JFrame("Vista Market");
         jfrm.setSize(500, 500);
         jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jfrm.setLayout(new FlowLayout());
         jfrm.setVisible(true);
 
-        JTabbedPane jtp = new JTabbedPane();
+        jtp = new JTabbedPane();
 
         //beverage tab
-        JPanel jp1 = new JPanel();
+        Beverages = createPanel(0);
         //food tab
-        JPanel jp2 = new JPanel();
+        Entraes = createPanel(1);
         //Groceries tab
-        JPanel jp3 = new JPanel();
+        Utilities = createPanel(2);
         //Utility Tab
-        JPanel jp4 = new JPanel();
-        //shopping cart tab
-        JPanel jp5 = new JPanel();
+        Groceries = createPanel(3);
 
-        jp1.setPreferredSize(new Dimension(300, 400));
-        jp1.setLayout(new GridBagLayout());
-        jp2.setLayout(new GridBagLayout());
-        jp3.setLayout(new GridBagLayout());
-        jp4.setLayout(new GridBagLayout());
-        jp5.setLayout(new GridBagLayout());
+        shoppingCart = createPanel(4);
 
-        Integer quants[] = new Integer[51];
-        for(int i = 1; i < quants.length;i++) {//Number range for each combobox(1-50)
-            quants[i] = i;
-        }
-        bevQuant = new JComboBox[beverages.length];
+        totalPrice = new JLabel("Total: $0.00");
 
-        labs[0].setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), BorderFactory.createBevelBorder(BevelBorder.LOWERED)));
-        jp1.add(labs[0],c);//Title added to jpanel
-        jp1.add(labs[1],makeConstraints(0,1,false)); //Adds beverages subheader
-        jp1.add(labs[2],makeConstraints(3,1,false));//Adds quantity subheader in the same row as beverages subheader
-        int currRow = 2;//The current row for the gridbaglayout
+        getTotal = new JButton("total");
+        getTotal.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                double total = 0.00;
+                int swipesNeeded = 0;
+                int pointsNeeded = 0;
 
-        for(int i = 0; i < bevQuant.length;i++) {//Initializes the comboboxes corresponding to each checkbox, adding them to Jpanel
-            bevQuant[i] = new JComboBox<Integer>(quants);
-            bevQuant[i].setVisible(false);
-            bevQuant[i].setSelectedIndex(1);
-            bevQuant[i].removeItemAt(0);
-            beverages[i].addActionListener(this);
-            if(i == 3) {//When index is 3, the Entries subheader is added to jpanel, incrementing to the next row
-                jp1.add(labs[3],makeConstraints(0,currRow,false));
-                currRow++;
+                for (Object i : selectedItems) {
+                    //System.out.println("Selected Item: " + i);
+                    if (i instanceof item) {
+                        item selected = (item) i;
+                        int quantity = (int) selected.jcombo.getSelectedItem();
+                        total += quantity * selected.price;
+                    }
+                }
+
+                if (mP.isSelected()) {
+
+                    pointsNeeded = (int) Math.ceil(total);
+                    swipesLabel.setText("Swipes needed: 0");
+                    pointsLabel.setText("Meal Points needed: " + pointsNeeded);
+                } else {
+
+                    swipesNeeded = (int) Math.min(Math.ceil(total / SWIPE_VALUE), 2);
+                    pointsNeeded = (int) Math.ceil(Math.max((total - swipesNeeded * SWIPE_VALUE), 0));
+
+                    swipesLabel.setText("Swipes needed: " + swipesNeeded);
+                    pointsLabel.setText("Meal Points needed: " + pointsNeeded);
+                }
+                totalPrice.setText("Total: $" + String.format("%.2f", total));
+
+                swipesLabel.setText("Swipes needed: " + swipesNeeded);
+
+                pointsLabel.setText("Meal Points needed: " + pointsNeeded);
+
             }
-            else if(i == 6) {//When index is 6, the Utilities subheader is added to jpanel, incrementing to the next row
-                jp1.add(labs[4],makeConstraints(0,currRow,false));
-                currRow++;
+        });
 
+        vista = new ImageIcon(getClass().getResource("vistaLogo.png"));
+        JLabel logo = new JLabel(vista);
+
+        JButton shop = new JButton("Shop Now!");
+
+        shop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shop.setVisible(false);
+                logo.setVisible(false);
+                jfrm.add(jtp);
             }
-            jp1.add(beverages[i],makeConstraints(0,currRow,false));//Current checkbox is added to jpanel
-            jp1.add(bevQuant[i],makeConstraints(3,currRow,true));//Current combobox is added to jpanel
-            currRow++;
-        }
+        });
 
-//		JScrollPane jsp = new JScrollPane(jpanel);
-//        jsp.setPreferredSize(new Dimension(275, 300));
-//        jfrm.add(jsp);
+        jtp.add("Beverages", Beverages);
+        jtp.add("Snacks", Entraes);
+        jtp.add("Utilities", Utilities);
+        jtp.add("Groceries", Groceries);
+        jtp.add("Shopping Cart", shoppingCart);
 
+        scroll = new JScrollPane(jtp);
 
-
-
-        jp1.add(labs[labs.length-1], makeConstraints(0,currRow, false));
-        currRow++;
-        jp1.add(Swipes, makeConstraints(0,currRow, false));
-        currRow++;
-        jp1.add(mP, makeConstraints(0,currRow, false));
-
-        jtp.add("Beverages", jp1);
-        jtp.add("Snacks", jp2);
-        jtp.add("Groceries", jp3);
-        jtp.add("Utilities", jp4);
-        jtp.add("Shopping Cart", jp5);
-
-        jfrm.add(jtp);
-
-        calc.addActionListener(this);
-        jfrm.add(calc);
+        jfrm.add(logo);
+        jfrm.add(shop, BorderLayout.PAGE_END);
     }
-    private static GridBagConstraints makeConstraints(int x, int y,boolean hug) {//Makes a gridbagconstraint for a given component
-        GridBagConstraints c = new GridBagConstraints();
-        if(hug) {//The bool that decides if a component hugs the left or right side of the jpanel
-            c.anchor = GridBagConstraints.LINE_END;
-        }else {
-            c.anchor = GridBagConstraints.NORTHWEST;
-        }
-        c.gridx = x;
-        c.gridy = y;
 
-        return c;//The gridbagconstraint is returned to be used by the component
-    }
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -145,56 +125,157 @@ public class finalProject implements ActionListener{
         });
 
     }
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(calc)) {
-            Double Total = 0.0;
-            for(int i = 0; i < selectedIndx.size();i++) {
-                //Converts selected integer of the combobox to a double
-                double currQuantValue = (double)(((Integer) bevQuant[selectedIndx.get(i)].getSelectedItem()).intValue());
-                //Checks the index of the current selected food item, uses that to decided the price, arrays have food items in order
-                //0-2 : Drinks
-                //3-5 : Entries
-                //>6  : Utilities
-                double price = (selectedIndx.get(i)<3)? 4.0 : ((selectedIndx.get(i)<6)?4.0:3.0);
-                Total+=price*currQuantValue;
-            }if(Swipes.isSelected()) {
-                int Swipetotal;
-                if(Total%8 == 0) {
-                    Swipetotal = (int) (Total/8);
-                    labs[labs.length-1].setText("<html>Total: $"+ String.format("%.2f", Total)
-                            +"<br>"+Swipetotal+" swipes needed");
-                }else{
-                    Swipetotal = (int) (1+ (Total/8));
-                    labs[labs.length-1].setText("<html>Total: $"+ String.format("%.2f", Total)
-                            +"<br>"+Swipetotal+" swipes needed");
-                }
 
-            }else {
-                labs[labs.length-1].setText("Total: $"+ String.format("%.2f", Total));
-            }
+    public JPanel createPanel(int panelIndex) {
+        JPanel thisPanel = new JPanel();
 
-        }else {
-            Integer i = getIndexOf(e.getSource());// Reference to both combobox and checkbox
-            if(((AbstractButton) e.getSource()).isSelected()) {//If the checkbox that caused the event is selected, then its combobox is made visible
-                bevQuant[i].setVisible(true);
-                selectedIndx.add(i);
+        thisPanel.setLayout(new BoxLayout(thisPanel,BoxLayout.Y_AXIS));
+        if(comps[panelIndex].length == 0) {
 
-            }else {//The combobox is invisible if the checkbox is deselected
-                bevQuant[i].setVisible(false);
-                selectedIndx.remove(i);
-            }
+        }else if(comps[panelIndex][0] instanceof JLabel){
+            JPanel firstPan = new JPanel();
+            firstPan.setMaximumSize(new Dimension(500,30));
+            firstPan.add(comps[panelIndex][0]);
+            firstPan.add(Box.createHorizontalGlue());
+            firstPan.add(Box.createHorizontalStrut(270));
+            firstPan.add(new JLabel("Quantity"));
+            thisPanel.add(firstPan);
         }
+        if(panelIndex < 4) {
+            for (int i = 1; i < comps[panelIndex].length; i++) {
+                JPanel currRow = new JPanel();
 
+                currRow.setMaximumSize(new Dimension(500, 30));
+                currRow.setLayout(new BoxLayout(currRow, BoxLayout.LINE_AXIS));
+                if (comps[panelIndex][i] instanceof item) {
+                    currRow.add(Box.createHorizontalStrut(30));
+                    currRow.add(((item) comps[panelIndex][i]).getJCheckBox());
+                    currRow.add(Box.createHorizontalGlue());
+
+                    currRow.add(((item) comps[panelIndex][i]).getJComboBox());
+                    currRow.add(Box.createHorizontalStrut(25));
+                } else {
+                    currRow.add(comps[panelIndex][i]);
+                }
+                thisPanel.add(currRow);
+            }
+        } else {
+            Swipes.setEnabled(true);
+            for(int i = 0; i < selectedItems.size(); ++i) {
+                JPanel currItem = new JPanel();
+                currItem.setMaximumSize(new Dimension(500, 30));
+                currItem.setLayout(new BoxLayout(currItem, BoxLayout.LINE_AXIS));
+                currItem.add(Box.createHorizontalStrut(30));
+                JLabel item = new JLabel(((item) selectedItems.get(i)).getJCheckBox().getText());
+                currItem.add(item);
+                currItem.add(Box.createHorizontalGlue());
+                currItem.add(((item) selectedItems.get(i)).getDupCombo());
+                currItem.add(Box.createHorizontalStrut(25));
+                thisPanel.add(currItem);
+                if(((item) selectedItems.get(i)).isUtility){
+                    Swipes.setEnabled(false);
+                }
+                thisPanel.add(Swipes);
+                thisPanel.add(mP);
+
+                thisPanel.add(totalPrice);
+                thisPanel.add(getTotal);
+                thisPanel.add(swipesLabel);
+                thisPanel.add(pointsLabel);
+            }
+
+
+
+        }
+        return thisPanel;
 
     }
-    private int getIndexOf(Object t) {//Checks the checkbox array to find the index for the checkbox that caused the event
-        for(int i = 0; i < beverages.length;i++) {
-            if(beverages[i].equals(t)) {
-                return i;
-            }
+
+    private class item extends JComponent{
+
+        public JCheckBox jcb;
+        public boolean isUtility;
+        public JComboBox jcombo, dupCombo;
+        Double price;
+        public JCheckBox getJCheckBox() {
+            return jcb;
+        }public JComboBox getJComboBox() {
+            return jcombo;
+        }public JComboBox getDupCombo() {
+            return dupCombo;
         }
-        return -1;
+        item(){
+            jcb = null;
+            jcombo = null;
+            dupCombo = null;
+            isUtility = false;
+        }
+
+        item(String jcb,double Price,boolean isUtil){
+            item itself = this;
+            this.isUtility = isUtil;
+            Integer quants[] = new Integer[51];
+            this.price = Price;
+            for(int i = 1; i < quants.length;i++) {//Number range for each combobox(1-50)
+                quants[i] = i;
+            }
+            this.jcb = new JCheckBox(jcb);
+            this.jcb.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if(((AbstractButton) e.getSource()).isSelected()) {
+                        jcombo.setVisible(true);
+                        dupCombo.setVisible(true);
+                        selectedItems.add(itself);
+                        jtp.remove(4);
+                        shoppingCart = createPanel(4);
+                        jtp.add("Shopping Cart", shoppingCart);
+                    }else {
+                        jcombo.setVisible(false);
+                        selectedItems.remove(itself);
+                        jtp.remove(4);
+                        shoppingCart = createPanel(4);
+                        jtp.add("Shopping Cart", shoppingCart);
+                    }
+                }
+
+            });
+            this.jcombo = new JComboBox<Integer>(quants);
+            this.jcombo.setVisible(false);
+            this.jcombo.removeItemAt(0);
+            this.jcombo.setMaximumSize(new Dimension(30,95));
+            this.jcombo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dupCombo.setSelectedItem(jcombo.getSelectedItem());
+                    if(selectedItems.contains(itself)) {
+                        //Do nothing
+                    }else {
+                        selectedItems.add(itself);
+                    }
+                }
+
+            });
+
+            this.dupCombo = new JComboBox<Integer>(quants);
+            this.dupCombo.setVisible(false);
+            this.dupCombo.removeItemAt(0);
+            this.dupCombo.setMaximumSize(new Dimension(30,95));
+            this.dupCombo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    jcombo.setSelectedItem(dupCombo.getSelectedItem());
+                    if(selectedItems.contains(itself)) {
+                        //Do nothing
+                    }else {
+                        selectedItems.add(itself);
+                    }
+                }
+
+            });
+        }item(String jcb, double Price){
+            this(jcb,Price,false);
+        }
 
     }
 }
