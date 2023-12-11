@@ -11,3 +11,10 @@ After the opening image of the Vista Market logo is displayed, the program displ
 ## How It Works
 
 The program opens with the Vista Market logo and a button to start shopping. After pressing the start shopping button, it displays various food and item tabs. In each product tab, there is a list of checkboxes for each item in the category. When a checkbox is selected, a quantity box is added for each item, and the item is added to a list of selected items found in the “Shopping Cart” tab. The shopping cart tab includes the items, a quantity box for each item, a button to calculate the total, and two checkboxes for meal swipes and meal points along with information on how many swipes the user would need to use to pay. If anything from the utility tab is selected, the swipes option is disabled, as meal swipes are only allowed to be used on food items.
+
+## Collaborators
+Ryan Dautel 
+Ian Dellosa
+Maddie Isaacs (https://github.com/mmisaacs)
+Michelle Paino
+Javi Wu
