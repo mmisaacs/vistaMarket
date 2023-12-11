@@ -21,7 +21,7 @@ public class finalProject{
 
                     {new JLabel("Entraes ($4.00)"),new item("Sandwich",4.0),new item("Salad",4.0),new item("Stouffer's Mac and Cheese",4.0)},
 
-                    {new JLabel("Utilities ($3.00)"),new item("Dawn Soap",3.0),new item("Sponge",3.0),new item("Advil",3.0)},
+                    {new JLabel("Utilities ($3.00)"),new item("Dawn Soap",3.0,true),new item("Sponge",3.0,true),new item("Advil",3.0,true)},
 
                     {new JLabel("Groceries ($6.00)"),new item("Bread", 6.0),new item("Eggs", 6.0), new item("Milk", 6.0)},
                     {new JLabel("Selected Items: ")}};
@@ -144,6 +144,7 @@ public class finalProject{
                 thisPanel.add(currRow);
             }
         } else {
+        	Swipes.setEnabled(true);
             for(int i = 0; i < selectedItems.size(); ++i) {
                 JPanel currItem = new JPanel();
                 currItem.setMaximumSize(new Dimension(500, 30));
@@ -155,7 +156,9 @@ public class finalProject{
                 currItem.add(((item) selectedItems.get(i)).getDupCombo());
                 currItem.add(Box.createHorizontalStrut(25));
                 thisPanel.add(currItem);
-
+                if(((item) selectedItems.get(i)).isUtility){
+                	Swipes.setEnabled(false);
+                }
                 thisPanel.add(Swipes);
                 thisPanel.add(mP);
                 
@@ -175,6 +178,7 @@ public class finalProject{
     private class item extends JComponent{
 
         public JCheckBox jcb;
+        public boolean isUtility;
         public JComboBox jcombo, dupCombo;
         Double price;
         public JCheckBox getJCheckBox() {
@@ -188,9 +192,12 @@ public class finalProject{
             jcb = null;
             jcombo = null;
             dupCombo = null;
+            isUtility = false;
         }
-        item(String jcb,double Price){
-            item itself =this;
+        
+        item(String jcb,double Price,boolean isUtil){
+            item itself = this;
+            this.isUtility = isUtil;
             Integer quants[] = new Integer[51];
             this.price = Price;
             for(int i = 1; i < quants.length;i++) {//Number range for each combobox(1-50)
@@ -250,6 +257,8 @@ public class finalProject{
                 }
 
             });
+        }item(String jcb, double Price){
+        	this(jcb,Price,false);
         }
 
     }
